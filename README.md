@@ -1,6 +1,5 @@
 # python_cloudfunction
 
 ```
-pip install python-dotenv
-pip install -U Flask
+pip install -r requiremets.txt
 ```

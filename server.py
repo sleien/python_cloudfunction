@@ -1,25 +1,26 @@
-from flask import Flask
-from flask import request
-import json, yaml, os
+from flask import Flask, request
+import json
+import yaml
+import os
 from dotenv import load_dotenv
 import hmac, hashlib
 
 load_dotenv()
 ADMIN_SECRET = os.getenv('ADMIN_SECRET')
-config = {}
+config = []
 
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
+app.config["DEBUG"] = os.getenv('DEBUG') 
 
 @app.route("/<function>")
 def dyn_function(function):
-    ex_locals={}
-    item = next(item for item in config["functions"] if item["endpoint"] == function)
+    print(config)
+    item = next(item for item in config if item["endpoint"] == function)
     if(not item):
         return "{'message': 'endpoint not found'}", 404
-    exec("import " + item["file"].split(".",1)[0])
-    return eval(item["file"].split(".",1)[0] + ".main()")
+    exec("import functions." + item["file"].split(".",1)[0])
+    return eval("functions." + item["file"].split(".",1)[0] + ".main()")
 
 
 @app.route("/admin/reload",  methods = ['POST'])
@@ -54,7 +55,12 @@ def validate_signature(payload, secret):
 
 def init():
     global config
-    config = yaml.safe_load(open(os.getcwd() + '/config.yaml'))
+    
+    for filename in os.listdir("configs"):
+        f = os.path.join("configs", filename)
+        endpoints = yaml.safe_load(open(f))
+        for e in endpoints:
+            config.append(e)
     return True
 
 init()

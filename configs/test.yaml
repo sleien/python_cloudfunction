@@ -1,0 +1,3 @@
+- file: "test.py"
+  endpoint: "test"
+  methods: '["GET"]'
