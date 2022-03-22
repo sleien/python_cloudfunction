@@ -15,10 +15,10 @@ pip install -r requiremets.txt
     - file: "test.py"
       endpoint: "test"
       methods: '["GET"]'
-    - file: "test2.py"
-      endpoint: "helloworld"
-      methods: '["GET"]'
+    - file: "helloworld.py"
+      cron: "* * * * *"
     ```
+    Use endpoint and methods for the function to be callable or cron for it to run on a timer. It is possible to use both.
 1. Create a python file with a main() function and return str int (html code)
     ```
     def main():

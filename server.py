@@ -4,10 +4,13 @@ import yaml
 import os
 from dotenv import load_dotenv
 import hmac, hashlib
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 load_dotenv()
 ADMIN_SECRET = os.getenv('ADMIN_SECRET')
 config = []
+scheduler = BackgroundScheduler()
 
 
 app = Flask(__name__)
@@ -15,7 +18,6 @@ app.config["DEBUG"] = os.getenv('DEBUG')
 
 @app.route("/<function>")
 def dyn_function(function):
-    print(config)
     item = next(item for item in config if item["endpoint"] == function)
     if(not item):
         return "{'message': 'endpoint not found'}", 404
@@ -53,15 +55,24 @@ def validate_signature(payload, secret):
     print(github_signature)
     return hmac.compare_digest(local_signature.hexdigest(), github_signature)
 
+def cron_executer(function_name):
+    exec("import functions." + function_name)
+    eval("functions." + function_name + ".main()")
+
 def init():
     global config
-    
+    new_config = []
     for filename in os.listdir("configs"):
         f = os.path.join("configs", filename)
-        endpoints = yaml.safe_load(open(f))
-        for e in endpoints:
-            config.append(e)
+        configs = yaml.safe_load(open(f))
+        for e in configs:
+            if e["endpoint"]:
+                new_config.append(e)
+            if e["cron"]:
+                scheduler.add_job(lambda: cron_executer(e["file"].split(".",1)[0]), CronTrigger.from_crontab(e["cron"]))
+    config = new_config
     return True
 
 init()
+scheduler.start()
 app.run()
