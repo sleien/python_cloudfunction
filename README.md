@@ -6,7 +6,7 @@ All functions are hosted at /function_name.
 
 ## Install
 ```
-pip install -r requiremets.txt
+pip install -r requirements.txt
 ```
 
 ## Configure new functions  
