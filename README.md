@@ -1,4 +1,4 @@
-# Python Clooudfunction
+# Python Cloudfunction
 
 This is a small webserver hosting serverless python functions. It's build for different github repos to deploy functions directly to it.
   
@@ -10,7 +10,7 @@ pip install -r requiremets.txt
 ```
 
 ## Configure new functions  
-1. Create config file in the configs folder (one is enough per source repository)
+1. Create [reponame].yaml file in the configs folder (one file is enough per source repository)
     ```
     - file: "test.py"
       endpoint: "test"
